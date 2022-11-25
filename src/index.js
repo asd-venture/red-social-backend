@@ -8,6 +8,7 @@ app.use(express.urlencoded({extended: false}));
 app.use(cors());
 
 // routes
-app.use(require('./routes/index'))
+app.use(require('./routes/users'))
+app.use(require('./routes/posts'))
 
 app.listen(3000);

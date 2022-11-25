@@ -14,8 +14,7 @@ INSERT INTO users (name, email) VALUES
 CREATE TABLE Users(
     id SERIAL PRIMARY KEY,
     username varchar(40) NOT NULL, 
-    email TEXT NOT NULL,
-    password varchar(10) NOT NULL
+    email TEXT NOT NULL
 );
 
 CREATE TABLE posts(
