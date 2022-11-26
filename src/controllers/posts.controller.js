@@ -35,20 +35,20 @@ const getPostsById = async (req, res) => {
 const createPost = async (req, res) => {
     console.log('The server just received data to add a new post');
     console.log(req.body);
+    const { content, userid } = req.body;
 
-    const { content, userID } = req.body;
-    const verify = await pool.query('SELECT * FROM post WHERE content = $1, userid = $2', [email, userID]);
+    const verify = await pool.query('SELECT * FROM posts WHERE (content = $1 and userid = $2)', [content, userid]);
 
-    if (content != false && verify.rows == false ){
+    if (content != false && verify.rows == false){
 
-        const response = await pool.query('INSERT INTO posts (content, userid, posttime) VALUES ($1, $2, current_timestamp)', [content, userID]);
+        const response = await pool.query('INSERT INTO posts (content, userid, posttime) VALUES ($1, $2, current_timestamp)', [content, userid]);
 
-        const response2 = await pool.query('SELECT * FROM post WHERE id = $1', [userID])
+        const response2 = await pool.query('SELECT * FROM users WHERE id = $1', [userid])
 
         res.json({
             message: 'User Add Succesfully',
             body: {
-                post: {content, userID},
+                post: {content, userid},
                 user: response2.rows[0]
             }
         });
@@ -65,10 +65,10 @@ const createPost = async (req, res) => {
 const updatePost = async (req, res) => {
     const id = req.params.id;
     console.log('The server just received a request to update the post: ' + id);
-    const { content, userID } = req.body;
+    const { content, userid } = req.body;
     const verify = await pool.query('SELECT * FROM posts WHERE id = $1', [id]);
     if (verify.rows != false){
-        const response = await pool.query('UPDATE posts SET content = $1, userid = $2 WHERE id = $3', [content, userID, id]);
+        const response = await pool.query('UPDATE posts SET content = $1, userid = $2 WHERE id = $3', [content, userid, id]);
         res.send('User Updated Sucessfully');
         console.log('The server just to update the post '+response.rows)
     }else{
