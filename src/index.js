@@ -10,5 +10,6 @@ app.use(cors());
 // routes
 app.use(require('./routes/users'))
 app.use(require('./routes/posts'))
+app.use(require('./routes/likes'))
 
 app.listen(3000);
