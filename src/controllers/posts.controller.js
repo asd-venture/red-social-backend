@@ -11,7 +11,7 @@ const pool = new Pool({
 const getPosts = async (req, res) => {
     console.log('The server just received a request to get all posts');
 
-    const response = await pool.query('SELECT posts.id, posts.content, posts.posttime, posts.userid, users.username, users.email, users.picture FROM users, posts WHERE users.id=posts.userid ORDER BY posts.id');
+    const response = await pool.query('SELECT posts.id, posts.content, posts.posttime, posts.userid, users.username, users.email, users.picture FROM users, posts WHERE users.id=posts.userid ORDER BY posts.id DESC');
     
     res.status(200).json(response.rows);
     console.log('The server just get all the posts');
@@ -21,6 +21,21 @@ const getPostsById = async (req, res) => {
     console.log('The server just received a request to get one post');
     const id = req.params.id;
     const response = await pool.query('SELECT * FROM posts WHERE id = $1', [id]);
+    if (response.rows != false){
+        res.json(response.rows);
+        console.log('The server just get one post ' + JSON.stringify(response.rows));
+    }else{
+        res.json({
+            message: 'The post does not exist'
+        });
+        console.log('The post does not exist');
+    }
+}
+
+const getPostsByUserId = async (req, res) => {
+    console.log('The server just received a request to get one post');
+    const userid = req.params.userid;
+    const response = await pool.query('SELECT posts.id, posts.content, posts.posttime, posts.userid, users.username, users.email, users.picture FROM users, posts WHERE users.id=$1 and posts.userid=$1 ORDER BY posts.id DESC;', [userid]);
     if (response.rows != false){
         res.json(response.rows);
         console.log('The server just get one post ' + JSON.stringify(response.rows));
@@ -99,6 +114,7 @@ const deletePost = async (req, res) => {
 module.exports = {
     getPosts,
     getPostsById,
+    getPostsByUserId,
     createPost,
     updatePost,
     deletePost

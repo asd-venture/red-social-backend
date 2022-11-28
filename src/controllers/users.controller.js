@@ -39,18 +39,21 @@ const createUser = async (req, res) => {
     const verify = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
     if (verify.rows == false){
         const response = await pool.query('INSERT INTO users (username, email, picture) VALUES ($1, $2, $3)', [username, email, picture]);
+        const response2 = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
         res.json({
             message: 'User Add Succesfully',
             body: {
-                user: {username, email, picture}
+                user: response2.rows[0]
             }
         });
         console.log('The server just add the user');
         
         const verify = await pool.query('WITH repeatedEmails AS ( SELECT MIN(id) as id, email FROM users GROUP BY email HAVING COUNT(*)>1) DELETE FROM users WHERE id not IN ( SELECT id FROM repeatedEmails) and email IN (SELECT email FROM repeatedEmails)')
     }else{
+        const response = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
         res.json({
-            message: 'User already exist'
+            message: 'User already exist',
+            user: response.rows[0]
         });
         console.log('User already exist');
     }
