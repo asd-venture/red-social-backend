@@ -10,7 +10,7 @@ const pool = new Pool({
 
 const getUsers = async (req, res) => {
     console.log('The server just received a request to get all users');
-    const response = await pool.query('SELECT * FROM users');
+    const response = await pool.query('SELECT * FROM users ORDER BY id DESC');
     res.status(200).json(response.rows);
     console.log('The server just get all the users');
 }

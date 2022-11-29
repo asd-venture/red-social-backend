@@ -33,17 +33,17 @@ const getPostsById = async (req, res) => {
 }
 
 const getPostsByUserId = async (req, res) => {
-    console.log('The server just received a request to get one post');
     const userid = req.params.userid;
+    console.log('The server just received a request to get posts from the user ' + userid );
     const response = await pool.query('SELECT posts.id, posts.content, posts.posttime, posts.userid, users.username, users.email, users.picture FROM users, posts WHERE users.id=$1 and posts.userid=$1 ORDER BY posts.id DESC;', [userid]);
     if (response.rows != false){
         res.json(response.rows);
-        console.log('The server just get one post ' + JSON.stringify(response.rows));
+        console.log('The server just get posts');
     }else{
         res.json({
-            message: 'The post does not exist'
+            message: 'The user does not have any post'
         });
-        console.log('The post does not exist');
+        console.log('The user does not have any post');
     }
 }
 
