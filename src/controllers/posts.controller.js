@@ -20,9 +20,9 @@ const getPosts = async (req, res) => {
 const getPostsById = async (req, res) => {
     console.log('The server just received a request to get one post');
     const id = req.params.id;
-    const response = await pool.query('SELECT * FROM posts WHERE id = $1', [id]);
+    const response = await pool.query('SELECT posts.id, posts.content, posts.userid, users.username, users.email, users.picture, posts.posttime FROM posts, users WHERE posts.id = $1 and posts.userid=users.id', [id]);
     if (response.rows != false){
-        res.json(response.rows);
+        res.json(response.rows[0]);
         console.log('The server just get one post ' + JSON.stringify(response.rows));
     }else{
         res.json({
@@ -35,7 +35,7 @@ const getPostsById = async (req, res) => {
 const getPostsByUserId = async (req, res) => {
     const userid = req.params.userid;
     console.log('The server just received a request to get posts from the user ' + userid );
-    const response = await pool.query('SELECT posts.id, posts.content, posts.posttime, posts.userid, users.username, users.email, users.picture FROM users, posts WHERE users.id=$1 and posts.userid=$1 ORDER BY posts.id DESC;', [userid]);
+    const response = await pool.query('SELECT posts.id, posts.content, posts.posttime, posts.userid, users.username, users.email, users.picture FROM users, posts WHERE users.id=$1 and posts.userid=$1 ORDER BY posts.id DESC', [userid]);
     if (response.rows != false){
         res.json(response.rows);
         console.log('The server just get posts');
@@ -71,9 +71,9 @@ const createPost = async (req, res) => {
 
     }else{
         res.json({
-            message: 'User already exist'
+            message: 'Post already exist'
         });
-        console.log('User already exist');
+        console.log('Post already exist');
     }
 }
 

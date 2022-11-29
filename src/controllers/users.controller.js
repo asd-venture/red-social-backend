@@ -20,7 +20,7 @@ const getUserById = async (req, res) => {
     const id = req.params.id;
     const response = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
     if (response.rows != false){
-        res.json(response.rows);
+        res.json(response.rows[0]);
         console.log('The server just get one user ' + JSON.stringify(response.rows));
     }else{
         res.json({

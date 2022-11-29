@@ -11,5 +11,6 @@ app.use(cors());
 app.use(require('./routes/users'))
 app.use(require('./routes/posts'))
 app.use(require('./routes/likes'))
+app.use(require('./routes/comments'))
 
 app.listen(3000);

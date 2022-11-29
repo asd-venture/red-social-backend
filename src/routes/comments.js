@@ -1,12 +1,14 @@
 const { Router } = require('express');
 const router = Router();
 
-const { getComments, getCommentById, createComment, deleteComment, updateComment } = require('../controllers/comments.controller');
+const { getComments, getCommentById, getCommentsByUserId, getCommentsByPostId, createComment, updateComment, deleteComment } = require('../controllers/comments.controller');
 
-router.get('/comment', getComments);
-router.get('/comment/:id', getCommentById);
-router.post('/comment', createComment);
-router.put('/comment/:id', deleteComment);
-router.delete('/comment/:id', updateComment);
+router.get('/comments', getComments);
+router.get('/comments/:id', getCommentById);
+router.get('/comments/user/:userid', getCommentsByUserId);
+router.get('/comments/post/:postid', getCommentsByPostId);
+router.post('/comments', createComment);
+router.put('/comments/:id', updateComment);
+router.delete('/comments/:id', deleteComment);
 
 module.exports = router;
