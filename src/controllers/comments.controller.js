@@ -10,7 +10,7 @@ const pool = new Pool({
 
 const getComments = async (req, res)=>{
     console.log('The server just received a request to get all comments');
-    const response = await pool.query('SELECT comments.id, comments.commmentcontent, comments.userid, users.username, users.email, users.picture, comments.postid, posts.content, posts.posttime FROM comments, users, posts WHERE comments.userid = users.id and comments.postid = posts.id ORDER BY comments.id DESC');
+    const response = await pool.query('SELECT comments.id, comments.nota, comments.userid, users.username, users.email, users.picture, comments.postid, posts.content, posts.posttime FROM comments, users, posts WHERE comments.userid = users.id and comments.postid = posts.id ORDER BY comments.id DESC');
     res.status(200).json(response.rows);
     console.log('The server just get all the comments');
 }
@@ -18,7 +18,7 @@ const getComments = async (req, res)=>{
 const getCommentById = async (req, res)=>{
     console.log('The server just received a request to get one comment');
     const id = req.params.id;
-    const response = await pool.query('SELECT comments.id, comments.commmentcontent, comments.userid, users.username, users.email, users.picture, comments.postid, posts.content, posts.posttime FROM comments, users, posts WHERE comments.id = $1 and comments.userid=users.id and comments.postid=posts.id ORDER BY comments.id DESC', [id]);
+    const response = await pool.query('SELECT comments.id, comments.nota, comments.userid, users.username, users.email, users.picture, comments.postid, posts.content, posts.posttime FROM comments, users, posts WHERE comments.id = $1 and comments.userid=users.id and comments.postid=posts.id ORDER BY comments.id DESC', [id]);
     if (response.rows != false){
         res.json(response.rows);
         console.log('The server just get one comment ' + JSON.stringify(response.rows));
@@ -33,7 +33,7 @@ const getCommentById = async (req, res)=>{
 const getCommentsByUserId = async (req, res)=>{
     console.log("The server just received a request to get user's comments");
     const userid = req.params.userid;
-    const response = await pool.query('SELECT comments.id, comments.commmentcontent, comments.userid, users.username, users.email, users.picture, comments.postid, posts.content, posts.posttime FROM comments, users, posts WHERE comments.userid=$1 and comments.postid=posts.id and comments.userid=users.id ORDER BY comments.userid DESC', [userid]);
+    const response = await pool.query('SELECT comments.id, comments.nota, comments.userid, users.username, users.email, users.picture, comments.postid, posts.content, posts.posttime FROM comments, users, posts WHERE comments.userid=$1 and comments.postid=posts.id and comments.userid=users.id ORDER BY comments.userid DESC', [userid]);
     if (response.rows != false){
         res.json(response.rows);
         console.log("The server just get the user's comments");
@@ -49,7 +49,7 @@ const getCommentsByUserId = async (req, res)=>{
 const getCommentsByPostId = async (req, res)=>{
     console.log("The server just received a request to get post's comments");
     const postid = req.params.postid;
-    const response = await pool.query('SELECT comments.id, comments.commmentcontent, comments.postid, posts.content, posts.posttime, comments.userid, users.username, users.email, users.picture FROM comments, users, posts WHERE comments.postid=$1 and comments.postid=posts.id and comments.userid=users.id ORDER BY comments.userid DESC', [postid]);
+    const response = await pool.query('SELECT comments.id, comments.nota, comments.postid, posts.content, posts.posttime, comments.userid, users.username, users.email, users.picture FROM comments, users, posts WHERE comments.postid=$1 and comments.postid=posts.id and comments.userid=users.id ORDER BY comments.userid DESC', [postid]);
     if (response.rows != false){
         res.json(response.rows);
         console.log("The server just get the post's comments");
@@ -64,13 +64,13 @@ const getCommentsByPostId = async (req, res)=>{
 const createComment = async (req, res)=>{
     console.log('The server just received data to add a new comment');
     console.log(req.body);
-    const { commmentcontent, userid, postid } = req.body;
+    const { nota, userid, postid } = req.body;
 
     const verify = await pool.query('SELECT * FROM comments WHERE (userid = $1 and postid = $2)', [userid, postid]);
 
     if (verify.rows == false){
 
-        const send = await pool.query('INSERT INTO comments (commmentcontent, userid, postid) VALUES ($1, $2, $3)', [commmentcontent, userid, postid]);
+        const send = await pool.query('INSERT INTO comments (nota, userid, postid) VALUES ($1, $2, $3)', [nota, userid, postid]);
         const response = await pool.query('SELECT * FROM comments WHERE (userid = $1 and postid = $2)', [userid, postid])
         const response2 = await pool.query('SELECT * FROM users WHERE id = $1', [userid])
         const response3 = await pool.query('SELECT * FROM posts WHERE id = $1', [postid])
@@ -96,10 +96,10 @@ const createComment = async (req, res)=>{
 const updateComment = async (req, res) => {
     const id = req.params.id;
     console.log('The server just received a request to update the comment: ' + id);
-    const { commmentcontent, userid, postid } = req.body;
+    const { nota, userid, postid } = req.body;
     const verify = await pool.query('SELECT * FROM comments WHERE id = $1', [id]);
     if (verify.rows != false){
-        const response = await pool.query('UPDATE comments SET commmentcontent = $1, userid = $2, postid = $3 WHERE id = $4', [commmentcontent, userid, postid, id]);
+        const response = await pool.query('UPDATE comments SET nota = $1, userid = $2, postid = $3 WHERE id = $4', [nota, userid, postid, id]);
         res.send('User Updated Sucessfully');
         console.log('The server just to update the comment '+response.rows)
     }else{
@@ -111,7 +111,20 @@ const updateComment = async (req, res) => {
 }
 
 const deleteComment = async (req, res)=>{
-
+    const id = req.params.id;
+    console.log('The server just received a request to delete the comment: ' + id);
+    const verify = await pool.query('SELECT * FROM comments WHERE id = $1', [id]);
+    if (verify.rows != false){
+        const response = await pool.query('DELETE FROM comments WHERE id = $1', [id]);
+        console.log(response);
+        res.json(`Comment ${id} deleted succesfully`);
+        console.log('The server just delete the comment');
+    }else{
+        res.json({
+            message: 'The comment does not exist'
+        });
+        console.log('The comment does not exist');
+    }
 }
 
 module.exports = {
