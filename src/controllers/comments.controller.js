@@ -10,7 +10,7 @@ const pool = new Pool({
 
 const getComments = async (req, res)=>{
     console.log('The server just received a request to get all comments');
-    const response = await pool.query('SELECT comments.id, comments.nota, comments.userid, users.username, users.email, users.picture, comments.postid, posts.content, posts.posttime FROM comments, users, posts WHERE comments.userid = users.id and comments.postid = posts.id ORDER BY comments.id DESC');
+    const response = await pool.query('SELECT * FROM comments, users, posts WHERE comments.userid = users.id and comments.postid = posts.id ORDER BY comments.id DESC');
     res.status(200).json(response.rows);
     console.log('The server just get all the comments');
 }
@@ -19,7 +19,7 @@ const getCommentById = async (req, res)=>{
     console.log('The server just received a request to get one comment');
     const id = req.params.id;
     const response = await pool.query('SELECT comments.id, comments.nota, comments.userid, users.username, users.email, users.picture, comments.postid, posts.content, posts.posttime FROM comments, users, posts WHERE comments.id = $1 and comments.userid=users.id and comments.postid=posts.id ORDER BY comments.id DESC', [id]);
-    if (response.rows != false){
+    if (response.rows == false){
         res.json(response.rows);
         console.log('The server just get one comment ' + JSON.stringify(response.rows));
     }else{
