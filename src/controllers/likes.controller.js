@@ -10,7 +10,7 @@ const pool = new Pool({
 
 const getLikes = async (req, res)=>{
     console.log('The server just received a request to get all likes');
-    const response = await pool.query('SELECT likes.id, likes.userid, users.username, users.email, users.picture, likes.postid, posts.content, posts.posttime FROM likes, users, posts WHERE likes.userid = users.id and likes.postid = posts.id ORDER BY likes.id DESC');
+    const response = await pool.query('SELECT * FROM likes, users, posts WHERE likes.useridlike = users.userid and likes.postidlike = posts.postid ORDER BY likes.likeid DESC');
     res.status(200).json(response.rows);
     console.log('The server just get all the like');
 }
@@ -18,7 +18,7 @@ const getLikes = async (req, res)=>{
 const getLikeById = async (req, res)=>{
     console.log('The server just received a request to get one like');
     const id = req.params.id;
-    const response = await pool.query('SELECT likes.id, likes.userid, users.username, users.email, users.picture, likes.postid, posts.content, posts.posttime FROM likes, users, posts WHERE likes.id = $1 and likes.userid=users.id and likes.postid=posts.id ORDER BY likes.id DESC', [id]);
+    const response = await pool.query('SELECT * FROM likes, users, posts WHERE likes.likeid = $1 and likes.useridlike=users.userid and likes.postidlike=posts.postid ORDER BY likes.likeid DESC', [id]);
     if (response.rows != false){
         res.json(response.rows);
         console.log('The server just get one like ' + JSON.stringify(response.rows));
@@ -32,8 +32,8 @@ const getLikeById = async (req, res)=>{
 
 const getLikesByUserId = async (req, res) => {
     console.log("The server just received a request to get user's likes");
-    const userid = req.params.userid;
-    const response = await pool.query('SELECT likes.id, likes.userid, users.username, users.email, users.picture, likes.postid, posts.content, posts.posttime FROM likes, users, posts WHERE likes.userid=$1 and likes.postid=posts.id and likes.userid=users.id ORDER BY likes.userid DESC', [userid]);
+    const useridlike = req.params.userid;
+    const response = await pool.query('SELECT * FROM likes, users, posts WHERE likes.useridlike=$1 and likes.postidlike=posts.postid and likes.useridlike=users.userid ORDER BY likes.likeid DESC', [useridlike]);
     if (response.rows != false){
         res.json(response.rows);
         console.log("The server just get the user's like");
@@ -47,8 +47,8 @@ const getLikesByUserId = async (req, res) => {
 
 const getLikesByPostId = async (req, res)=>{
     console.log("The server just received a request to get post's likes");
-    const postid = req.params.postid;
-    const response = await pool.query('SELECT likes.id, likes.postid, posts.content, posts.posttime, likes.userid, users.username, users.email, users.picture FROM likes, users, posts WHERE likes.postid=$1 and likes.postid=posts.id and likes.userid=users.id ORDER BY likes.userid DESC', [postid]);
+    const postidlike = req.params.postid;
+    const response = await pool.query('SELECT * FROM likes, users, posts WHERE likes.postidlike=$1 and likes.postidlike=posts.postid and likes.useridlike=users.userid ORDER BY likes.likeid DESC', [postidlike]);
     if (response.rows != false){
         res.json(response.rows);
         console.log("The server just get the post's likes");
@@ -63,16 +63,16 @@ const getLikesByPostId = async (req, res)=>{
 const createLike = async (req, res)=>{
     console.log('The server just received data to add a new like');
     console.log(req.body);
-    const { userid, postid } = req.body;
+    const { useridlike, postidlike } = req.body;
 
-    const verify = await pool.query('SELECT * FROM likes WHERE (userid = $1 and postid = $2)', [userid, postid]);
+    const verify = await pool.query('SELECT * FROM likes WHERE (useridlike = $1 and postidlike = $2)', [useridlike, postidlike]);
 
     if (verify.rows == false){
 
-        const send = await pool.query('INSERT INTO likes (userid, postid) VALUES ($1, $2)', [userid, postid]);
-        const response = await pool.query('SELECT * FROM likes WHERE (userid = $1 and postid = $2)', [userid, postid])
-        const response2 = await pool.query('SELECT * FROM users WHERE id = $1', [userid])
-        const response3 = await pool.query('SELECT * FROM posts WHERE id = $1', [postid])
+        const send = await pool.query('INSERT INTO likes (useridlike, postidlike) VALUES ($1, $2)', [useridlike, postidlike]);
+        const response = await pool.query('SELECT * FROM likes WHERE (useridlike = $1 and postidlike = $2)', [useridlike, postidlike])
+        const response2 = await pool.query('SELECT * FROM users WHERE userid = $1', [useridlike])
+        const response3 = await pool.query('SELECT * FROM posts WHERE postid = $1', [postidlike])
 
         res.json({
             message: 'User Add Succesfully',
@@ -93,13 +93,13 @@ const createLike = async (req, res)=>{
 }
 
 const deleteLike = async (req, res)=>{
-    const id = req.params.id;
-    console.log('The server just received a request to delete the like: ' + id);
-    const verify = await pool.query('SELECT * FROM likes WHERE id = $1', [id]);
+    const likeid = req.params.id;
+    console.log('The server just received a request to delete the like: ' + likeid);
+    const verify = await pool.query('SELECT * FROM likes WHERE likeid = $1', [likeid]);
     if (verify.rows != false){
-        const response = await pool.query('DELETE FROM likes WHERE id = $1', [id]);
+        const response = await pool.query('DELETE FROM likes WHERE likeid = $1', [likeid]);
         console.log(response);
-        res.json(`Like ${id} deleted succesfully`);
+        res.json(`Like ${likeid} deleted succesfully`);
         console.log('The server just delete the like');
     }else{
         res.json({
