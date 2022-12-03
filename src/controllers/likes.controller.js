@@ -53,9 +53,7 @@ const getLikesByPostId = async (req, res)=>{
         res.json(response.rows);
         console.log("The server just get the post's likes");
     }else{
-        res.json({
-            message: 'The post does not exist or that post does not have any like'
-        });
+        res.send('The post does not exist or that post does not have any like');
         console.log('The post does not exist or that post does not have any like');
     }
 }
@@ -71,22 +69,18 @@ const createLike = async (req, res)=>{
 
         const send = await pool.query('INSERT INTO likes (useridlike, postidlike) VALUES ($1, $2)', [useridlike, postidlike]);
         const response = await pool.query('SELECT * FROM likes WHERE (useridlike = $1 and postidlike = $2)', [useridlike, postidlike])
-        const response2 = await pool.query('SELECT * FROM users WHERE userid = $1', [useridlike])
-        const response3 = await pool.query('SELECT * FROM posts WHERE postid = $1', [postidlike])
 
         res.json({
-            message: 'User Add Succesfully',
-            body: {
-                like: response.rows[0],
-                user: response2.rows[0],
-                post: response3.rows[0]
-            }
+            message: 'Like Add Succesfully',
+            like: response.rows[0]
         });
         console.log('The server just add the like');
 
     }else{
+        const response = await pool.query('SELECT * FROM likes WHERE (useridlike = $1 and postidlike = $2)', [useridlike, postidlike])
         res.json({
-            message: 'Like already exist'
+            message: 'Like already exist',
+            like: response.rows[0]
         });
         console.log('Like already exist');
     }
