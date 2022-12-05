@@ -50,10 +50,15 @@ const getLikesByPostId = async (req, res)=>{
     const postidlike = req.params.postid;
     const response = await pool.query('SELECT * FROM likes, users, posts WHERE likes.postidlike=$1 and likes.postidlike=posts.postid and likes.useridlike=users.userid ORDER BY likes.likeid DESC', [postidlike]);
     if (response.rows != false){
-        res.json(response.rows);
+        res.json({
+            posts: response.rows
+        });
         console.log("The server just get the post's likes");
     }else{
-        res.send('The post does not exist or that post does not have any like');
+        res.json({
+            message: 'The post does not exist or that post does not have any like',
+            posts: response.rows
+        });
         console.log('The post does not exist or that post does not have any like');
     }
 }
