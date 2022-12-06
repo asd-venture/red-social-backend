@@ -1,33 +1,33 @@
 CREATE DATABASE redsocial
 
 CREATE TABLE users(
-    id SERIAL PRIMARY KEY,
+    userid SERIAL PRIMARY KEY,
     username varchar(40) NOT NULL, 
     email TEXT NOT NULL, 
     picture TEXT NOT NULL
 );
 
 CREATE TABLE posts(
-    id SERIAL PRIMARY KEY,
+    postid SERIAL PRIMARY KEY,
     content TEXT NOT NULL,
-    userid int NOT NULL,
+    useridpost int NOT NULL,
     postTime TIMESTAMP NOT NULL,
-    FOREIGN KEY (userid) REFERENCES users(id)
+    FOREIGN KEY (useridpost) REFERENCES users(userid)
 );
 
 CREATE TABLE comments(
-    id SERIAL PRIMARY KEY,
+    commentid SERIAL PRIMARY KEY,
     content TEXT NOT NULL,
-    userid int NOT NULL,
-    postid int NOT NULL,
-    FOREIGN KEY (userid) REFERENCES users(id),
-    FOREIGN KEY (postid) REFERENCES posts(id)
+    useridcomment int NOT NULL,
+    postidcomment int NOT NULL,
+    FOREIGN KEY (useridcomment) REFERENCES users(userid),
+    FOREIGN KEY (postidcomment) REFERENCES posts(postid)
 );
 
 CREATE TABLE likes(
-    id SERIAL PRIMARY KEY,
-    userid int NOT NULL,
-    postid int NOT NULL,
-    FOREIGN KEY (userid) REFERENCES users(id),
-    FOREIGN KEY (postid) REFERENCES posts(id)
+    likeid SERIAL PRIMARY KEY,
+    useridcomment int NOT NULL,
+    postidcomment int NOT NULL,
+    FOREIGN KEY (useridcomment) REFERENCES users(userid),
+    FOREIGN KEY (postidcomment) REFERENCES posts(postid)
 );

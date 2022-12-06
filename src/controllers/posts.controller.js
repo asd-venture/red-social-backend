@@ -35,7 +35,7 @@ const getPostsById = async (req, res) => {
 const getPostsByUserId = async (req, res) => {
     const useridpost = req.params.userid;
     console.log('The server just received a request to get posts from the user ' + useridpost );
-    const response = await pool.query('SELECT * FROM posts, users  WHERE users.userid=$1 and posts.useridpost=$1 ORDER BY posts.useridpost DESC', [useridpost]);
+    const response = await pool.query('SELECT * FROM posts, users  WHERE users.userid=$1 and posts.useridpost=$1 ORDER BY posts.postid DESC', [useridpost]);
     if (response.rows != false){
         res.json(response.rows);
         console.log('The server just get posts');
