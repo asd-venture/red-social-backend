@@ -15,21 +15,6 @@ const getComments = async (req, res)=>{
     console.log('The server just get all the comments');
 }
 
-const getCommentById = async (req, res)=>{
-    console.log('The server just received a request to get one comment');
-    const commentid = req.params.id;
-    const response = await pool.query('SELECT * FROM comments, users, posts WHERE comments.commentid = $1 and comments.useridcomment=users.userid and comments.postidcomment=posts.postid', [commentid]);
-    if (response.rows != false){
-        res.json(response.rows);
-        console.log('The server just get one comment ' + JSON.stringify(response.rows));
-    }else{
-        res.json({
-            message: 'The comment does not exist'
-        });
-        console.log('The comment does not exist');
-    }
-}
-
 const getCommentsByUserId = async (req, res)=>{
     console.log("The server just received a request to get user's comments");
     const useridcomment = req.params.userid;
@@ -46,7 +31,7 @@ const getCommentsByUserId = async (req, res)=>{
 }
 
 
-const getCommentsByPostId = async (req, res)=>{
+const getCommentsByPostId = async(req, res)=>{
     console.log("The server just received a request to get post's comments");
     const postidcomment = req.params.postid;
     const response = await pool.query('SELECT * FROM comments, users, posts WHERE comments.postidcomment=$1 and comments.postidcomment=posts.postid and comments.useridcomment=users.userid ORDER BY comments.commentid DESC', [postidcomment]);
@@ -129,7 +114,6 @@ const deleteComment = async (req, res)=>{
 
 module.exports = {
     getComments,
-    getCommentById,
     getCommentsByUserId,
     getCommentsByPostId,
     createComment,

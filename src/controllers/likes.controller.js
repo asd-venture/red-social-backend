@@ -15,21 +15,6 @@ const getLikes = async (req, res)=>{
     console.log('The server just get all the like');
 }
 
-const getLikeById = async (req, res)=>{
-    console.log('The server just received a request to get one like');
-    const id = req.params.id;
-    const response = await pool.query('SELECT * FROM likes, users, posts WHERE likes.likeid = $1 and likes.useridlike=users.userid and likes.postidlike=posts.postid ORDER BY likes.likeid DESC', [id]);
-    if (response.rows != false){
-        res.json(response.rows);
-        console.log('The server just get one like ' + JSON.stringify(response.rows));
-    }else{
-        res.json({
-            message: 'The like does not exist'
-        });
-        console.log('The like does not exist');
-    }
-}
-
 const getLikesByUserId = async (req, res) => {
     console.log("The server just received a request to get user's likes");
     const useridlike = req.params.userid;
@@ -110,7 +95,6 @@ const deleteLike = async (req, res)=>{
 
 module.exports = {
     getLikes,
-    getLikeById,
     getLikesByUserId,
     getLikesByPostId,
     createLike,
