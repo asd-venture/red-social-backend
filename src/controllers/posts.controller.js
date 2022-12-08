@@ -17,7 +17,7 @@ const getPosts = async (req, res) => {
     console.log('The server just get all the posts');
 }
 
-const getPostsById = async (req, res) => {
+const getPostById = async (req, res) => {
     console.log('The server just received a request to get one post');
     const postid = req.params.id;
     const response = await pool.query('SELECT * FROM posts, users WHERE posts.postid = $1 and posts.useridpost=users.userid', [postid]);
@@ -106,7 +106,7 @@ const deletePost = async (req, res) => {
 
 module.exports = {
     getPosts,
-    getPostsById,
+    getPostById,
     getPostsByUserId,
     createPost,
     updatePost,
