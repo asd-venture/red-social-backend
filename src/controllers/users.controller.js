@@ -9,14 +9,12 @@ const pool = new Pool({
 })
 
 const getUsers = async (req, res) => {
-    console.log('The server just received a request to get all users');
     const response = await pool.query('SELECT * FROM users ORDER BY userid DESC');
     res.status(200).json(response.rows);
     console.log('The server just get all the users');
 }
 
 const getUserById = async (req, res) => {
-    console.log('The server just received a request to get one user');
     const userid = req.params.id;
     const response = await pool.query('SELECT * FROM users WHERE userid = $1', [userid]);
     if (response.rows != false){
@@ -31,9 +29,6 @@ const getUserById = async (req, res) => {
 }
 
 const createUser = async (req, res) => {
-    console.log('The server just received data to add a new user');
-    console.log(req.body);
-
     const { username, email, picture } = req.body;
     
     const verify = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
@@ -50,10 +45,9 @@ const createUser = async (req, res) => {
         
         const verify = await pool.query('WITH repeatedEmails AS ( SELECT MIN(userid) as userid, email FROM users GROUP BY email HAVING COUNT(*)>1) DELETE FROM users WHERE userid not IN ( SELECT userid FROM repeatedEmails) and email IN (SELECT email FROM repeatedEmails)')
     }else{
-        const response = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
         res.json({
             message: 'User already exist',
-            user: response.rows[0]
+            user: verify.rows[0]
         });
         console.log('User already exist');
     }
@@ -62,11 +56,11 @@ const createUser = async (req, res) => {
  
 const updateUser = async (req, res) => {
     const userid = req.params.id;
-    console.log('The server just received a request to update the user: ' + userid);
     const { username, email, picture } = req.body;
     const verify = await pool.query('SELECT * FROM users WHERE userid = $1', [userid]);
     if (verify.rows != false){
         const response = await pool.query('UPDATE users SET username = $1, email = $2, picture = $3 WHERE userid = $4', [username, email, picture, userid]);
+        
         res.send('User Updated Sucessfully');
         console.log('The server just to update the user '+response.rows)
     }else{
@@ -79,11 +73,9 @@ const updateUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
     const userid = req.params.id;
-    console.log('The server just received a request to delete the user: ' + userid);
     const verify = await pool.query('SELECT * FROM users WHERE userid = $1', [userid]);
     if (verify.rows != false){
         const response = await pool.query('DELETE FROM users WHERE userid = $1', [userid]);
-        console.log(response);
         res.json(`User ${userid} deleted succesfully`);
         console.log('The server just delete the user');
     }else{
