@@ -35,6 +35,7 @@ const getLikesByPostId = async (req, res)=>{
         res.json(response.rows);
         console.log("The server just get the post's likes");
     }else{
+        res.send('The post does not exist or that post does not have any like');
         console.log('The post does not exist or that post does not have any like');
     }
 }
@@ -67,8 +68,14 @@ const deleteLike = async (req, res)=>{
     const verify = await pool.query('SELECT * FROM likes WHERE likeid = $1', [likeid]);
     if (verify.rows != false){
         const response = await pool.query('DELETE FROM likes WHERE likeid = $1', [likeid]);
+        res.json({
+            message: 'Like delete succesfully'
+        })
         console.log('The server just delete the like');
     }else{
+        res.json({
+            message: 'The like does not exist'
+        })
         console.log('The like does not exist');
     }
 }
