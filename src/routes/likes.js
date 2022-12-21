@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const router = Router();
 
-const { getLikes, getLikeById, getLikesByUserId, getLikesByPostId, createLike, deleteLike } = require('../controllers/likes.controller');
+const { getLikes, getLikesByUserId, getLikesByPostId, createLike, deleteLike } = require('../controllers/likes.controller');
 
 router.get('/likes', getLikes);
 router.get('/likes/user/:userid', getLikesByUserId);
