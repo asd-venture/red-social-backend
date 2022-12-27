@@ -10,7 +10,8 @@ const pool = new Pool({
 
 const getPosts = async (req, res) => {
     try {
-        const response = await pool.query('SELECT * FROM posts, users WHERE users.userid=posts.useridpost ORDER BY posts.postid DESC');
+        const { page, size } = req.query;
+        const response = await pool.query('SELECT * FROM posts, users WHERE users.userid=posts.useridpost ORDER BY posts.postid DESC LIMIT $2 OFFSET (($1 - 1) * $2)', [page, size]);
         res.status(200).json(response.rows);
         console.log('The server just get all the posts');
     } catch (error) {
