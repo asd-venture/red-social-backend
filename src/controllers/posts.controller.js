@@ -11,8 +11,14 @@ const pool = new Pool({
 const getPosts = async (req, res) => {
     try {
         const { page, size } = req.query;
-        const response = await pool.query('SELECT * FROM posts, users WHERE users.userid=posts.useridpost ORDER BY posts.postid DESC LIMIT $2 OFFSET (($1 - 1) * $2)', [page, size]);
-        res.status(200).json(response.rows);
+        const results = await pool.query('SELECT * FROM posts, users WHERE users.userid=posts.useridpost ORDER BY posts.postid DESC LIMIT $2 OFFSET (($1 - 1) * $2)', [page, size]);
+        const total_results = await pool.query('SELECT count(*) FROM posts')
+        res.status(200).json({
+            page: parseInt(page),
+            results: results.rows,
+            total_pages: Math.ceil(total_results.rows[0].count/size),
+            total_results: parseInt(total_results.rows[0].count)
+        });
         console.log('The server just get all the posts');
     } catch (error) {
         res.json("the server catch this error getting posts: "+ error)
