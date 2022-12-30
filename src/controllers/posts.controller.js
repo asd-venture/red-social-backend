@@ -48,16 +48,16 @@ const getPostById = async (req, res) => {
 const getPostsByUserId = async (req, res) => {
     try {
         const useridpost = req.params.userid;
-        const response = await pool.query('SELECT * FROM posts, users WHERE users.userid=$1 and posts.useridpost=$1 ORDER BY posts.postid DESC', [useridpost]);
-        if (response.rows != false){
-            res.json(response.rows);
-            console.log('The server just get posts');
-        }else{
-            res.json({
-                message: 'The user does not have any post'
-            });
-            console.log('The user does not have any post');
-        }
+        const { page, size } = req.query;
+        const results = await pool.query('SELECT * FROM posts, users WHERE users.userid=$1 and posts.useridpost=$1 ORDER BY posts.postid DESC LIMIT $3 OFFSET (($2 - 1) * $3)', [useridpost, page, size]);
+        const total_results = await pool.query('SELECT count(*) FROM posts WHERE posts.useridpost=$1', [useridpost])
+        res.status(200).json({
+            page: parseInt(page),
+            results: results.rows,
+            total_pages: Math.ceil(total_results.rows[0].count/size),
+            total_results: parseInt(total_results.rows[0].count)
+        });
+        console.log('The server just get posts');
     } catch (error) {
         res.json("the server catch this error getting the user's posts: "+ error)
         console.log("the server catch this error getting the user's posts: "+ error)
