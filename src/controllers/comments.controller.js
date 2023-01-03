@@ -58,7 +58,7 @@ const createComment = async (req, res)=>{
         const { nota, useridcomment, postidcomment } = req.body;
         const verify = await pool.query('SELECT * FROM comments WHERE (useridcomment = $1 and postidcomment = $2)', [useridcomment, postidcomment]);
         if (verify.rows == false){
-            const send = await pool.query('INSERT INTO comments (nota, useridcomment, postidcomment) VALUES ($1, $2, $3)', [nota, useridcomment, postidcomment]);
+            const response = await pool.query('INSERT INTO comments (nota, useridcomment, postidcomment) VALUES ($1, $2, $3)', [nota, useridcomment, postidcomment]);
             
             res.json({
                 message: 'User Add Succesfully',

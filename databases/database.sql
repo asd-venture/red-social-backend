@@ -15,6 +15,13 @@ CREATE TABLE posts(
     FOREIGN KEY (useridpost) REFERENCES users(userid)
 );
 
+CREATE TABLE images(
+    imageid TEXT NOT NULL,
+    urlimage TEXT NOT NULL,
+    postidimage int NOT NULL,
+    FOREIGN KEY (postidimage) REFERENCES posts(postid)
+);
+
 CREATE TABLE comments(
     commentid SERIAL PRIMARY KEY,
     content TEXT NOT NULL,

@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const router = Router();
 
-const { getComments, getCommentById, getCommentsByUserId, getCommentsByPostId, createComment, updateComment, deleteComment } = require('../controllers/comments.controller');
+const { getComments, getCommentsByUserId, getCommentsByPostId, createComment, updateComment, deleteComment } = require('../controllers/comments.controller');
 
 router.get('/comments', getComments);
 router.get('/comments/user/:userid', getCommentsByUserId);

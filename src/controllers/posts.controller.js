@@ -1,4 +1,5 @@
 const { Pool }  = require('pg');
+let { uploadImage } = require('../utils/cloudinary.js');
 
 const pool = new Pool({
     host: 'localhost',
@@ -11,7 +12,7 @@ const pool = new Pool({
 const getPosts = async (req, res) => {
     try {
         const { page, size } = req.query;
-        const results = await pool.query('SELECT * FROM posts, users WHERE users.userid=posts.useridpost ORDER BY posts.postid DESC LIMIT $2 OFFSET (($1 - 1) * $2)', [page, size]);
+        const results = await pool.query('SELECT * FROM posts INNER JOIN users ON users.userid=posts.useridpost LEFT JOIN images ON images.postidimage=posts.postid ORDER BY posts.postid DESC LIMIT $2 OFFSET (($1 - 1) * $2)', [page, size]);
         const total_results = await pool.query('SELECT count(*) FROM posts')
         res.status(200).json({
             page: parseInt(page),
@@ -49,7 +50,7 @@ const getPostsByUserId = async (req, res) => {
     try {
         const useridpost = req.params.userid;
         const { page, size } = req.query;
-        const results = await pool.query('SELECT * FROM posts, users WHERE users.userid=$1 and posts.useridpost=$1 ORDER BY posts.postid DESC LIMIT $3 OFFSET (($2 - 1) * $3)', [useridpost, page, size]);
+        const results = await pool.query('SELECT * FROM posts INNER JOIN users ON users.userid=$1 LEFT JOIN images ON images.postidimage=posts.postid WHERE posts.useridpost=$1 ORDER BY posts.postid DESC LIMIT $3 OFFSET (($2 - 1) * $3)', [useridpost, page, size]);
         const total_results = await pool.query('SELECT count(*) FROM posts WHERE posts.useridpost=$1', [useridpost])
         res.status(200).json({
             page: parseInt(page),
@@ -64,22 +65,23 @@ const getPostsByUserId = async (req, res) => {
     }
 }
 
-const createPost = async (req, res) => {
+const createPost = (req, res) => {
     try {
         const { content, useridpost } = req.body;
-        if (content != false){
-            const response = await pool.query('INSERT INTO posts (content, useridpost, posttime) VALUES ($1, $2, current_timestamp)', [content, useridpost]);
-
+        if(content || req.files?.image ){
+            pool.query('INSERT INTO posts (content, useridpost, posttime) VALUES ($1, $2, current_timestamp)', [content, useridpost]).then(post =>{
+                if (req.files?.image) {
+                    pool.query('SELECT * FROM posts ORDER BY postid DESC LIMIT 1').then(response=>{
+                        uploadImage(req.files.image.tempFilePath).then(image=>{
+                            pool.query('INSERT INTO images (imageid, urlimage, postidimage) VALUES ($1, $2, $3)', [image.public_id, image.secure_url, response.rows[0]?.postid])
+                        })
+                    })
+                }
+            })            
             res.json({
                 message: 'User Add Succesfully',
             });
             console.log('The server just add the post');
-
-        }else{
-            res.json({
-                message: 'Post already exist'
-            });
-            console.log('Post already exist');
         }
     } catch (error) {
         res.json("the server catch this error creating a post: "+ error)
@@ -114,7 +116,7 @@ const deletePost = async (req, res) => {
         const postid = req.params.id;
         const verify = await pool.query('SELECT * FROM posts WHERE postid = $1', [postid]);
         if (verify.rows != false){
-            const response = await pool.query('DELETE FROM posts, likes, comments WHERE posts.postid = $1 && likes.postidlike = posts.postid && comments.postidcomment = posts.postid', [postid]);
+            const response = await pool.query('DELETE FROM posts WHERE posts.postid = $1', [postid]);
             res.json(`Post ${postid} deleted succesfully`);
             console.log('The server just delete the post');
         }else{
