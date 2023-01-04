@@ -65,19 +65,15 @@ const getPostsByUserId = async (req, res) => {
     }
 }
 
-const createPost = (req, res) => {
+const createPost = async (req, res) => {
     try {
         const { content, useridpost } = req.body;
         if(content || req.files?.image ){
-            pool.query('INSERT INTO posts (content, useridpost, posttime) VALUES ($1, $2, current_timestamp)', [content, useridpost]).then(post =>{
-                if (req.files?.image) {
-                    pool.query('SELECT * FROM posts ORDER BY postid DESC LIMIT 1').then(response=>{
-                        uploadImage(req.files.image.tempFilePath).then(image=>{
-                            pool.query('INSERT INTO images (imageid, urlimage, postidimage) VALUES ($1, $2, $3)', [image.public_id, image.secure_url, response.rows[0]?.postid])
-                        })
-                    })
-                }
-            })            
+            const response = await pool.query('INSERT INTO posts (content, useridpost, posttime) VALUES ($1, $2, current_timestamp) RETURNING *', [content, useridpost])
+            if (req.files?.image) {
+                const image = await uploadImage(req.files.image.tempFilePath)
+                await pool.query('INSERT INTO images (imageid, urlimage, postidimage) VALUES ($1, $2, $3)', [image.public_id, image.secure_url, response.rows[0]?.postid])
+            }
             res.json({
                 message: 'User Add Succesfully',
             });
