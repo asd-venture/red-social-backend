@@ -112,7 +112,7 @@ const deletePost = async (req, res) => {
         const postid = req.params.id;
         const verify = await pool.query('SELECT * FROM posts WHERE postid = $1', [postid]);
         if (verify.rows != false){
-            const response = await pool.query('DELETE FROM posts WHERE posts.postid = $1', [postid]);
+            const response = await pool.query('DELETE FROM posts WHERE postid = $1', [postid]);
             res.json(`Post ${postid} deleted succesfully`);
             console.log('The server just delete the post');
         }else{

@@ -12,29 +12,29 @@ CREATE TABLE posts(
     content TEXT NOT NULL,
     useridpost int NOT NULL,
     postTime TIMESTAMP NOT NULL,
-    FOREIGN KEY (useridpost) REFERENCES users(userid)
+    FOREIGN KEY (useridpost) REFERENCES users(userid) ON DELETE CASCADE
 );
 
 CREATE TABLE images(
     imageid TEXT NOT NULL,
     urlimage TEXT NOT NULL,
     postidimage int NOT NULL,
-    FOREIGN KEY (postidimage) REFERENCES posts(postid)
+    FOREIGN KEY (postidimage) REFERENCES posts(postid) ON DELETE CASCADE
 );
 
 CREATE TABLE comments(
     commentid SERIAL PRIMARY KEY,
-    content TEXT NOT NULL,
+    nota TEXT NOT NULL,
     useridcomment int NOT NULL,
     postidcomment int NOT NULL,
-    FOREIGN KEY (useridcomment) REFERENCES users(userid),
-    FOREIGN KEY (postidcomment) REFERENCES posts(postid)
+    FOREIGN KEY (useridcomment) REFERENCES users(userid) ON DELETE CASCADE,
+    FOREIGN KEY (postidcomment) REFERENCES posts(postid) ON DELETE CASCADE
 );
 
 CREATE TABLE likes(
     likeid SERIAL PRIMARY KEY,
-    useridcomment int NOT NULL,
-    postidcomment int NOT NULL,
-    FOREIGN KEY (useridcomment) REFERENCES users(userid),
-    FOREIGN KEY (postidcomment) REFERENCES posts(postid)
+    useridlike int NOT NULL,
+    postidlike int NOT NULL,
+    FOREIGN KEY (useridlike) REFERENCES users(userid) ON DELETE CASCADE,
+    FOREIGN KEY (postidlike) REFERENCES posts(postid) ON DELETE CASCADE
 );
