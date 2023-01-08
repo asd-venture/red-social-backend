@@ -1,12 +1,19 @@
 const { Pool }  = require('pg');
 let { uploadImage } = require('../utils/cloudinary.js');
+const { 
+    DB_HOST,
+    DB_USER,
+    DB_PASSWORD,
+    DB_NAME,
+    DB_PORT 
+} = require('../config')
 
 const pool = new Pool({
-    host: 'localhost',
-    user: 'postgres',
-    password: 'password',
-    database: 'redsocial',
-    port: '5432'
+    host: DB_HOST,
+    user: DB_USER,
+    password: DB_PASSWORD,
+    database: DB_NAME,
+    port: DB_PORT
 })
 
 const getPosts = async (req, res) => {

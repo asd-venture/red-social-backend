@@ -1,6 +1,8 @@
 const cors = require('cors')
 const fileUpload = require('express-fileupload')
 const express = require('express');
+const { PORT } = require('./config.js')
+
 const app = express();
 
 require('dotenv').config();
@@ -20,4 +22,4 @@ app.use(require('./routes/posts'))
 app.use(require('./routes/likes'))
 app.use(require('./routes/comments'))
 
-app.listen(3000);
+app.listen(PORT);
