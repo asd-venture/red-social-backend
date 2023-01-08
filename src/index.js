@@ -1,11 +1,11 @@
 const cors = require('cors')
 const fileUpload = require('express-fileupload')
 const express = require('express');
+require('dotenv').config();
 const { PORT } = require('./config.js')
 
 const app = express();
 
-require('dotenv').config();
 
 // middlewares
 app.use(express.json());
