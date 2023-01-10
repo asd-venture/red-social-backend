@@ -1,7 +1,6 @@
 const { Pool }  = require('pg');
 const fs = require('fs-extra');
 let { uploadImage, deleteImage } = require('../utils/cloudinary.js');
-let { uploadImage } = require('../utils/cloudinary.js');
 const { 
     DB_HOST,
     DB_USER,
