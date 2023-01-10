@@ -1,5 +1,6 @@
 const { Pool }  = require('pg');
-let { uploadImage } = require('../utils/cloudinary.js');
+const fs = require('fs-extra');
+let { uploadImage, deleteImage } = require('../utils/cloudinary.js');
 
 const pool = new Pool({
     host: 'localhost',
@@ -69,10 +70,11 @@ const createPost = async (req, res) => {
     try {
         const { content, useridpost } = req.body;
         if(content || req.files?.image ){
-            const response = await pool.query('INSERT INTO posts (content, useridpost, posttime) VALUES ($1, $2, current_timestamp) RETURNING *', [content, useridpost])
+            const response = await pool.query('INSERT INTO posts (content, useridpost, posttime) VALUES ($1, $2, current_timestamp) RETURNING *', [content, useridpost]);
             if (req.files?.image) {
                 const image = await uploadImage(req.files.image.tempFilePath)
-                await pool.query('INSERT INTO images (imageid, urlimage, postidimage) VALUES ($1, $2, $3)', [image.public_id, image.secure_url, response.rows[0]?.postid])
+                await pool.query('INSERT INTO images (imageid, urlimage, postidimage) VALUES ($1, $2, $3)', [image.public_id, image.secure_url, response.rows[0]?.postid]);
+                await fs.unlink(req.files.image.tempFilePath);
             }
             res.json({
                 message: 'User Add Succesfully',
@@ -112,6 +114,10 @@ const deletePost = async (req, res) => {
         const postid = req.params.id;
         const verify = await pool.query('SELECT * FROM posts WHERE postid = $1', [postid]);
         if (verify.rows != false){
+            const image = await pool.query('SELECT * FROM images WHERE postidimage = $1', [postid])
+            if(image.rows != false){
+                await deleteImage(image.rows[0].imageid)
+            }
             const response = await pool.query('DELETE FROM posts WHERE postid = $1', [postid]);
             res.json(`Post ${postid} deleted succesfully`);
             console.log('The server just delete the post');

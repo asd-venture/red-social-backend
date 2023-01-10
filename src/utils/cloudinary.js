@@ -13,4 +13,8 @@ const uploadImage = async(filePath)=>{
     })
 } 
 
-module.exports = {uploadImage}
+const deleteImage = async(publicId)=>{
+    return await cloudinary.upload.destroy(publicId)
+}
+
+module.exports = {uploadImage, deleteImage}
