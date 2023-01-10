@@ -123,6 +123,7 @@ const deletePost = async (req, res) => {
         if (verify.rows != false){
             const image = await pool.query('SELECT * FROM images WHERE postidimage = $1', [postid])
             if(image.rows != false){
+                const responseImage = await pool.query('DELETE FROM images WHERE postidimage = $1', [postid])
                 await deleteImage(image.rows[0].imageid)
             }
             const response = await pool.query('DELETE FROM posts WHERE postid = $1', [postid]);
