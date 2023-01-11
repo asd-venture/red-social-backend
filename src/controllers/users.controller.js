@@ -99,7 +99,6 @@ const updateUser = async (req, res) => {
         const verify = await pool.query('SELECT * FROM users WHERE userid = $1', [userid]);
         if (verify.rows != false){
             const response = await pool.query('UPDATE users SET username = $1, email = $2, picture = $3 WHERE userid = $4', [username, email, picture, userid]);
-            
             res.send('User Updated Sucessfully');
             console.log('The server just to update the user '+response.rows)
         }else{
