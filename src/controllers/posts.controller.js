@@ -28,7 +28,6 @@ const getPosts = async (req, res) => {
             total_pages: Math.ceil(total_results.rows[0].count/size),
             total_results: parseInt(total_results.rows[0].count)
         });
-        console.log('The server just get all the posts');
     } catch (error) {
         res.json("the server catch this error getting posts: "+ error)
         console.log("the server catch this error getting posts: "+ error)
@@ -41,12 +40,10 @@ const getPostById = async (req, res) => {
         const response = await pool.query('SELECT * FROM posts, users WHERE posts.postid = $1 and posts.useridpost=users.userid', [postid]);
         if (response.rows != false){
             res.json(response.rows[0]);
-            console.log('The server just get one post ' + JSON.stringify(response.rows));
         }else{
             res.json({
                 message: 'The post does not exist'
             });
-            console.log('The post does not exist');
         }
     } catch (error) {
         res.json("the server catch this error getting a post: "+ error)
@@ -66,7 +63,6 @@ const getPostsByUserId = async (req, res) => {
             total_pages: Math.ceil(total_results.rows[0].count/size),
             total_results: parseInt(total_results.rows[0].count)
         });
-        console.log('The server just get posts');
     } catch (error) {
         res.json("the server catch this error getting the user's posts: "+ error)
         console.log("the server catch this error getting the user's posts: "+ error)
@@ -86,7 +82,6 @@ const createPost = async (req, res) => {
             res.json({
                 message: 'User Add Succesfully',
             });
-            console.log('The server just add the post');
         }
     } catch (error) {
         res.json("the server catch this error creating a post: "+ error)
@@ -103,12 +98,10 @@ const updatePost = async (req, res) => {
             const response = await pool.query('UPDATE posts SET content = $1, useridpost = $2 WHERE postid = $3', [content, useridpost, postid]);
 
             res.send('User Updated Sucessfully');
-            console.log('The server just to update the post '+response.rows)
         }else{
             res.json({
                 message: 'The post does not exist'
             });
-            console.log('The post does not exist');
         }
     } catch (error) {
         res.json("the server catch this error updating a post: "+ error)
@@ -128,12 +121,10 @@ const deletePost = async (req, res) => {
             }
             const response = await pool.query('DELETE FROM posts WHERE postid = $1', [postid]);
             res.json(`Post ${postid} deleted succesfully`);
-            console.log('The server just delete the post');
         }else{
             res.json({
                 message: 'The post does not exist'
             });
-            console.log('The post does not exist');
         }
     } catch (error) {
         res.json("the server catch this error removing a post: "+ error)
